@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  font-family: "General Sans", sans-serif !important;
+  font-weight: 400;
+}
+
+body {
+  background-color: #fff3f3;
+}
+
+.font-med{
+  font-weight: 600;
+}
+
+.rect-boxes{
+  top: 10vh !important;
+  width: 90vw !important;
+}
