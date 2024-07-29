@@ -2,11 +2,50 @@ import React, { useState, useEffect } from "react";
 
 const Developer = () => {
   const [userAnnotations, setUserAnnotations] = useState([]);
+
+  // Get user info from localStorage
   const user = JSON.parse(localStorage.getItem("user"));
 
   const userTasks = userAnnotations.filter(
     (task) => task.USER_EMAIL === user.email
   );
+
+  const handleUpdate = async (task) => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const body = {
+      role: user.role,
+      taskid: task.TASK_ID,
+      status: task.newStatus,
+      comment: task.newComment || "Invalid",
+    };
+
+    try {
+      const response = await fetch("http://localhost:3000/api/userAnnotation", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Update successful:", data);
+
+      // Update the local state to reflect the changes
+      const updatedTasks = userAnnotations.map((t) =>
+        t.TASK_ID === task.TASK_ID
+          ? { ...t, STATUS: task.newStatus, COMMENT: task.newComment }
+          : t
+      );
+      setUserAnnotations(updatedTasks);
+    } catch (error) {
+      console.error("Error updating task:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchUserAnnotations = async () => {
@@ -15,13 +54,12 @@ const Developer = () => {
           throw new Error("User information not found");
         }
         const response = await fetch(
-          "http://localhost:3000/api/userAnnotations?email=" + user.email,
+          `http://localhost:3000/api/userAnnotations?email=${user.email}`,
           {
             credentials: "include",
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              // Authorization: `Token +"86b08ad39f4d277161b14cfc94a8a53f1d23f3f8"`,
             },
           }
         );
@@ -37,7 +75,7 @@ const Developer = () => {
     };
 
     fetchUserAnnotations();
-  }, []);
+  }, [user]);
 
   return (
     <div>
@@ -81,8 +119,8 @@ const Developer = () => {
             </thead>
 
             <tbody>
-              {userAnnotations.map((task) => (
-                <tr>
+              {userAnnotations.map((task, index) => (
+                <tr key={index}>
                   <td className="py-2 px-4 border-b border-red-200">
                     <a
                       href={`https://notlabel-studio.toloka-test.ai/projects/${task.PROJECT}/data?tab=13807&page=1&task=${task.TASK_ID}`}
@@ -96,25 +134,15 @@ const Developer = () => {
                     {task.USER_EMAIL}
                   </td>
                   <td className="py-2 px-4 border-b border-red-200">
-                    <select className="bg-white border border-red-300 rounded px-2 py-1">
-                      <option
-                        value="Not Started"
-                        selected={task.STATUS === "Not Started"}
-                      >
-                        Not Started
-                      </option>
-                      <option
-                        value="In Progress"
-                        selected={task.STATUS === "In Progress"}
-                      >
-                        In Progress
-                      </option>
-                      <option
-                        value="Completed"
-                        selected={task.STATUS === "Completed"}
-                      >
-                        Completed
-                      </option>
+                    <select
+                      className="bg-white border border-red-300 rounded px-2 py-1"
+                      value={task.STATUS}
+                      onChange={(e) =>
+                        handleUpdate({ ...task, newStatus: e.target.value })
+                      }
+                    >
+                      <option value="Not Started">Not Started</option>
+                      <option value="Completed">Completed</option>
                     </select>
                   </td>
                   <td className="py-2 px-4 border-b border-red-200">
@@ -132,11 +160,16 @@ const Developer = () => {
                     <textarea
                       className="w-full bg-white border border-red-300 rounded px-2 py-1"
                       rows="3"
-                      defaultValue=""
+                      onChange={(e) =>
+                        handleUpdate({ ...task, newComment: e.target.value })
+                      }
                     />
                   </td>
                   <td className="py-2 px-4 border-b border-red-200">
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <button
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={() => handleUpdate(task)}
+                    >
                       Update
                     </button>
                   </td>

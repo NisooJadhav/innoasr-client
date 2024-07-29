@@ -119,7 +119,7 @@ const Reviewer = () => {
           </thead>
           <tbody>
             {userAnnotations.map((task) => (
-              <tr>
+              <tr key={task.TASK_ID + task.USER_EMAIL}>
                 <td className="py-2 px-4 border-b border-red-200">
                   <a
                     href={`https://notlabel-studio.toloka-test.ai/projects/${task.PROJECT}/data?tab=13807&page=1&task=${task.TASK_ID}`}
@@ -139,12 +139,6 @@ const Reviewer = () => {
                       selected={task.STATUS === "Not Started"}
                     >
                       Not Started
-                    </option>
-                    <option
-                      value="In Progress"
-                      selected={task.STATUS === "In Progress"}
-                    >
-                      In Progress
                     </option>
                     <option
                       value="Completed"
@@ -180,7 +174,7 @@ const Reviewer = () => {
               </tr>
             ))}
             {userTasks.map((task) => (
-              <tr>
+              <tr key={task.TASK_ID + task.USER_EMAIL}>
                 <td className="py-2 px-4 border-b border-red-200">
                   <a
                     href={`https://notlabel-studio.toloka-test.ai/projects/${task.PROJECT}/data?tab=13807&page=1&task=${task.TASK_ID}`}
@@ -205,16 +199,16 @@ const Reviewer = () => {
                       Not Started
                     </option>
                     <option
-                      value="In Progress"
-                      selected={task.STATUS === "In Progress"}
+                      value="Done"
+                      selected={task.STATUS === "Done"}
                     >
-                      In Progress
+                      Done
                     </option>
                     <option
-                      value="Completed"
-                      selected={task.STATUS === "Completed"}
+                      value="Recheck"
+                      selected={task.STATUS === "Recheck"}
                     >
-                      Completed
+                      Recheck
                     </option>
                   </select>
                 </td>
@@ -227,6 +221,7 @@ const Reviewer = () => {
                     rows="3"
                     defaultValue={task.COMMENT || ""}
                     placeholder="your comment here"
+                    required
                   ></textarea>
                 </td>
                 <td className="py-2 px-4 border-b border-red-200">
