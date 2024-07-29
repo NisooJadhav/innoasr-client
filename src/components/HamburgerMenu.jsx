@@ -154,7 +154,7 @@ const HamburgerMenu = () => {
                   Select Mail:
                 </label>
                 <select name="mail" id="mail" className="mb-5 w-[10vw] ml-4">
-                  <option value="" disabled selected>
+                  <option value="" disabled defaultValue>
                     Select mail
                   </option>
                   {mails.map((mail, index) => (
